@@ -299,7 +299,7 @@ def generate_summary(text, client):
     
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.5-flash",
             contents=prompt
         )
         return response.text
@@ -493,7 +493,7 @@ else:
         try:
             # Start a chat session with the document pre-loaded
             st.session_state.chat_session = client.chats.create(
-                model="gemini-2.5-flash",
+                model="gemini-3.5-flash",
                 config=types.GenerateContentConfig(
                     system_instruction=(
                         "You are AuraDoc, a premium AI document assistant. "
