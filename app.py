@@ -454,12 +454,19 @@ else:
             st.session_state.chat_session = None
             if "doc_uploader" in st.session_state:
                 del st.session_state["doc_uploader"]
+            if "gemini_client" in st.session_state:
+                del st.session_state["gemini_client"]
+            if "current_api_key" in st.session_state:
+                del st.session_state["current_api_key"]
             st.rerun()
             
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Initialize client
-    client = get_gemini_client(api_key)
+    # Initialize client in session state to persist it across runs and prevent connection closing
+    if "gemini_client" not in st.session_state or st.session_state.get("current_api_key") != api_key:
+        st.session_state.gemini_client = get_gemini_client(api_key)
+        st.session_state.current_api_key = api_key
+    client = st.session_state.gemini_client
     
     # 5c. Text Extraction Phase
     if not st.session_state.document_text:
