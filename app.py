@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import math
 
 # Load environment variables for local development
-load_dotenv()
+load_dotenv(override=True)
 
 # ==========================================
 # 1. PAGE SETUP & CONFIGURATION
