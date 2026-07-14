@@ -349,40 +349,50 @@ if not api_key:
     """, unsafe_allow_html=True)
     st.stop()
 
-# 5b. Document Uploader Layout (Centered if no file, side-by-side if uploaded)
+# Render the file uploader at the top level on every run
+uploaded_file = st.file_uploader(
+    "Upload PDF or DOCX file",
+    type=["pdf", "docx"],
+    key="doc_uploader",
+    label_visibility="collapsed" if st.session_state.current_file_name else "visible"
+)
+
+# 5b. Main layout logic based on uploaded file
 if not uploaded_file:
-    # Render welcome layout with centered dropzone
-    st.markdown('<div class="welcome-card">', unsafe_allow_html=True)
-    st.markdown('<div style="font-size: 50px; margin-bottom: 10px;">📥</div>', unsafe_allow_html=True)
-    st.markdown('<h3 style="color: #f1f5f9; font-size: 22px; font-weight: 600; margin-bottom: 20px;">Analyze Your Document</h3>', unsafe_allow_html=True)
-    
-    uploaded_file = st.file_uploader(
-        "Upload PDF or DOCX file to get started",
-        type=["pdf", "docx"],
-        label_visibility="collapsed"
-    )
-    
+    # Clear session values on file removal/emptying
+    st.session_state.current_file_name = None
+    st.session_state.document_text = ""
+    st.session_state.document_summary = ""
+    st.session_state.messages = []
+    st.session_state.chat_session = None
+
+    # Render welcome layout
     st.markdown("""
-    <p style="color: #64748b; font-size: 13px; margin-top: 15px;">Supported formats: PDF, DOCX • File size up to 50MB</p>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: left; max-width: 700px; margin: 40px auto 0 auto; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px;">
-        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
-            <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">⚡ Direct Summary</h5>
-            <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">Extract themes, highlights, and action lists automatically within seconds.</p>
+    <div class="welcome-card" style="margin-top: 15px;">
+        <div style="font-size: 50px; margin-bottom: 10px;">📥</div>
+        <h3 style="color: #f1f5f9; font-size: 22px; font-weight: 600; margin-bottom: 20px;">Analyze Your Document</h3>
+        <p style="color: #94a3b8; font-size: 14px; max-width: 500px; margin: 0 auto 30px auto; line-height: 1.6;">
+            AuraDoc AI parses your document locally in the browser/server and uses Gemini's next-gen 1-million token context window to perform comprehensive analysis and exact-context chat.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: left; max-width: 700px; margin: 0 auto; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px;">
+            <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+                <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">⚡ Direct Summary</h5>
+                <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">Extract themes, highlights, and action lists automatically within seconds.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+                <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">💬 Natural Chat</h5>
+                <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">Stateful chatbot understands the entire document context accurately.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+                <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">🔒 Pure Privacy</h5>
+                <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">No third-party middleware. All file processing runs directly on your instance.</p>
+            </div>
         </div>
-        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
-            <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">💬 Natural Chat</h5>
-            <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">Stateful chatbot understands the entire document context accurately.</p>
-        </div>
-        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
-            <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">🔒 Pure Privacy</h5>
-            <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">No third-party middleware. All file processing runs directly on your instance.</p>
-        </div>
-    </div>
     </div>
     """, unsafe_allow_html=True)
 
 else:
-    # File is uploaded. Reset state if it has changed.
+    # File is uploaded. Reset state if the file itself changed.
     if st.session_state.current_file_name != uploaded_file.name:
         st.session_state.current_file_name = uploaded_file.name
         st.session_state.document_text = ""
@@ -390,79 +400,58 @@ else:
         st.session_state.messages = []
         st.session_state.chat_session = None
 
-    # Render top-bar side-by-side uploader + stats cards
+    # Render top bar with file stats and clean reset button
     st.markdown('<div class="glass-card" style="padding: 20px;">', unsafe_allow_html=True)
-    col_uploader, col_stats = st.columns([7, 5])
+    col_file, col_stats, col_reset = st.columns([5, 5, 2])
     
-    with col_uploader:
-        st.markdown('<h4 style="font-size: 14px; margin-top: 0; color: #94a3b8; margin-bottom: 8px;">📂 Active File</h4>', unsafe_allow_html=True)
-        # Render a horizontal layout for file info and uploader
+    with col_file:
+        st.markdown('<h4 style="font-size: 13px; margin-top: 0; color: #94a3b8; margin-bottom: 6px;">📂 Loaded Document</h4>', unsafe_allow_html=True)
         st.markdown(f"""
-        <div style="background: rgba(138, 43, 226, 0.08); border: 1px solid rgba(138, 43, 226, 0.2); padding: 10px 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <div style="font-size: 15px; font-weight: 600; color: #ffffff;">📄 {uploaded_file.name}</div>
-            <div style="color: #a78bfa; font-size: 13px;">Ready for analysis</div>
+        <div style="background: rgba(138, 43, 226, 0.06); border: 1px solid rgba(138, 43, 226, 0.15); padding: 10px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; color: #ffffff;">
+            📄 {uploaded_file.name}
         </div>
         """, unsafe_allow_html=True)
         
-        # Row layout for small replace file and reset buttons
-        col_btn1, col_btn2 = st.columns([1, 1])
-        with col_btn1:
-            # We place file_uploader inside a popover or just let them drag to replace
-            st.file_uploader("Replace document", type=["pdf", "docx"], label_visibility="collapsed", key="replace_file")
-        with col_btn2:
-            if st.button("🗑️ Reset Application", use_container_width=True):
-                st.session_state.current_file_name = None
-                st.session_state.document_text = ""
-                st.session_state.document_summary = ""
-                st.session_state.messages = []
-                st.session_state.chat_session = None
-                st.rerun()
-                
     with col_stats:
-        st.markdown('<h4 style="font-size: 14px; margin-top: 0; color: #94a3b8; margin-bottom: 8px;">📊 Document Stats</h4>', unsafe_allow_html=True)
-        
-        # Calculate stats dynamically if text is extracted
+        st.markdown('<h4 style="font-size: 13px; margin-top: 0; color: #94a3b8; margin-bottom: 6px;">📊 Quick Stats</h4>', unsafe_allow_html=True)
         if st.session_state.document_text:
             text = st.session_state.document_text
             words = len(text.split())
-            chars = len(text)
-            read_time = math.ceil(words / 200) # Assuming average 200 WPM
+            read_time = math.ceil(words / 200)
             file_size_kb = len(uploaded_file.getvalue()) / 1024
             
             st.markdown(f"""
-            <div class="stats-container">
-                <div class="stats-badge">
-                    <div class="stats-label">Words</div>
-                    <div class="stats-value">{words:,}</div>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; text-align:center;">
+                    <span style="font-size:10px; color:#64748b; text-transform:uppercase;">Words</span><br>
+                    <span style="font-size:15px; font-weight:700; color:#c084fc;">{words:,}</span>
                 </div>
-                <div class="stats-badge">
-                    <div class="stats-label">Read Time</div>
-                    <div class="stats-value">{read_time} min</div>
+                <div style="flex:1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; text-align:center;">
+                    <span style="font-size:10px; color:#64748b; text-transform:uppercase;">Read Time</span><br>
+                    <span style="font-size:15px; font-weight:700; color:#c084fc;">{read_time} min</span>
+                </div>
+                <div style="flex:1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; text-align:center;">
+                    <span style="font-size:10px; color:#64748b; text-transform:uppercase;">Size</span><br>
+                    <span style="font-size:15px; font-weight:700; color:#c084fc;">{file_size_kb:.1f} KB</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
         else:
-            st.markdown("""
-            <div class="stats-container">
-                <div class="stats-badge"><div style="color: #64748b; font-size: 13px;">Extracting stats...</div></div>
-                <div class="stats-badge"><div style="color: #64748b; font-size: 13px;">Extracting stats...</div></div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("<div style='color:#64748b; font-size:13px; padding-top:8px;'>Extracting metrics...</div>", unsafe_allow_html=True)
             
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Handle replacement file changes
-    if st.session_state.get("replace_file") is not None:
-        new_file = st.session_state.replace_file
-        if new_file.name != st.session_state.current_file_name:
-            st.session_state.current_file_name = new_file.name
+    with col_reset:
+        st.markdown('<h4 style="font-size: 13px; margin-top: 0; color: #94a3b8; margin-bottom: 6px;">⚙️ Controls</h4>', unsafe_allow_html=True)
+        if st.button("🗑️ Reset", use_container_width=True):
+            st.session_state.current_file_name = None
             st.session_state.document_text = ""
             st.session_state.document_summary = ""
             st.session_state.messages = []
             st.session_state.chat_session = None
-            # Copy replacement file upload object
-            uploaded_file = new_file
+            if "doc_uploader" in st.session_state:
+                del st.session_state["doc_uploader"]
             st.rerun()
+            
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Initialize client
     client = get_gemini_client(api_key)
