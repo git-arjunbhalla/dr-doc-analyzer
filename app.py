@@ -321,6 +321,11 @@ except Exception:
 
 api_key = env_key or secrets_key
 
+# Check if the API key is configured and not a placeholder
+is_key_valid = False
+if api_key and api_key.strip() != "" and "YOUR_GEMINI_API_KEY" not in api_key:
+    is_key_valid = True
+
 # ==========================================
 # 5. MAIN AREA PANEL (REDESIGNED)
 # ==========================================
@@ -330,7 +335,7 @@ st.markdown('<h1 class="glow-header" style="text-align: center; margin-top: 20px
 st.markdown('<p style="text-align: center; color: #94a3b8; font-size: 16px; margin-bottom: 30px;">Direct, secure PDF & DOCX intelligence platform. Zero setup required.</p>', unsafe_allow_html=True)
 
 # 5a. API Key Error Block
-if not api_key:
+if not is_key_valid:
     st.markdown("""
     <div class="welcome-card" style="border-color: rgba(239, 68, 68, 0.4); max-width: 650px;">
         <div style="font-size: 60px; margin-bottom: 15px;">🔑</div>
