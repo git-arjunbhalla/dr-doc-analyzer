@@ -592,10 +592,10 @@ else:
                 
                 try:
                     # Stream the response from Gemini
-                    with st.session_state.chat_session.send_message_stream(user_query) as stream:
-                        for chunk in stream:
-                            full_response += chunk.text
-                            message_placeholder.markdown(full_response + "▌")
+                    response_stream = st.session_state.chat_session.send_message_stream(user_query)
+                    for chunk in response_stream:
+                        full_response += chunk.text
+                        message_placeholder.markdown(full_response + "▌")
                     message_placeholder.markdown(full_response)
                     st.session_state.messages.append({"role": "assistant", "content": full_response})
                     
