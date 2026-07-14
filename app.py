@@ -14,8 +14,8 @@ load_dotenv(override=True)
 # 1. PAGE SETUP & CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="AuraDoc AI - Document Analyzer & Chatbot",
-    page_icon="🌌",
+    page_title="Dr.Doc - Document Analyzer & Chatbot",
+    page_icon="🩺",
     layout="wide",
     initial_sidebar_state="collapsed" # Hide sidebar by default
 )
@@ -34,14 +34,58 @@ st.markdown("""
         font-family: 'Outfit', sans-serif;
     }
     
-    /* Main Background & Accent glow */
+    /* Main Background with base dark color and grid pattern */
     [data-testid="stAppViewContainer"] {
-        background-color: #080914;
+        background-color: #05060b;
         background-image: 
-            radial-gradient(at 0% 0%, rgba(138, 43, 226, 0.18) 0px, transparent 40%),
-            radial-gradient(at 100% 0%, rgba(0, 191, 255, 0.15) 0px, transparent 40%),
-            radial-gradient(at 50% 100%, rgba(138, 43, 226, 0.1) 0px, transparent 50%);
+            linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+        background-size: 40px 40px;
         background-attachment: fixed;
+    }
+    
+    /* Dynamic pulsing backdrop blobs */
+    .glow-blob {
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(120px);
+        z-index: -99;
+        opacity: 0.28;
+        pointer-events: none;
+        animation: pulseGlow 15s infinite alternate ease-in-out;
+    }
+    
+    .blob-1 {
+        top: -15%;
+        left: -10%;
+        background: radial-gradient(circle, #8a2be2 0%, rgba(74, 0, 224, 0.4) 70%, transparent 100%);
+    }
+    
+    .blob-2 {
+        bottom: -15%;
+        right: -10%;
+        background: radial-gradient(circle, #00bfff 0%, rgba(0, 34, 62, 0.4) 70%, transparent 100%);
+        animation-delay: -7.5s;
+    }
+    
+    @keyframes pulseGlow {
+        0% { transform: scale(1) translate(0px, 0px) rotate(0deg); opacity: 0.2; }
+        50% { transform: scale(1.18) translate(50px, -30px) rotate(90deg); opacity: 0.38; }
+        100% { transform: scale(0.9) translate(-20px, 30px) rotate(180deg); opacity: 0.25; }
+    }
+    
+    /* Animation keyframes for sliding elements */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     /* Hide sidebar button to completely ignore sidebar */
@@ -49,71 +93,71 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Glassmorphism containers */
+    /* Glassmorphism containers with active animations */
     .glass-card {
-        background: rgba(17, 20, 39, 0.45);
-        backdrop-filter: blur(25px) saturate(180%);
-        -webkit-backdrop-filter: blur(25px) saturate(180%);
-        border-radius: 20px;
+        background: rgba(13, 16, 31, 0.4);
+        backdrop-filter: blur(30px) saturate(210%);
+        -webkit-backdrop-filter: blur(30px) saturate(210%);
+        border-radius: 24px;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 30px;
+        padding: 35px;
         margin-bottom: 25px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+        animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(168, 85, 247, 0.3);
+        box-shadow: 0 20px 60px 0 rgba(138, 43, 226, 0.15), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
     }
     
     .glass-card-subtle {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid rgba(255, 255, 255, 0.03);
         border-radius: 16px;
         padding: 20px;
     }
     
-    /* Glowing headers */
+    /* Glowing headers with multi-gradient color scale */
     .glow-header {
-        background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #f43f5e 100%);
+        background: linear-gradient(135deg, #c084fc 0%, #a855f7 35%, #ec4899 70%, #3b82f6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.8px;
     }
     
     /* Welcome landing page illustration card */
     .welcome-card {
-        background: rgba(17, 20, 39, 0.35);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
+        background: rgba(13, 16, 31, 0.35);
+        backdrop-filter: blur(25px);
+        border-radius: 28px;
         border: 1px solid rgba(138, 43, 226, 0.15);
-        padding: 50px 30px;
+        padding: 55px 35px;
         text-align: center;
         margin: 20px auto;
         max-width: 800px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+        animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
     
-    /* Document statistics badge container */
-    .stats-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        height: 100%;
-    }
-    
+    /* Document statistics badges */
     .stats-badge {
-        padding: 14px;
-        background: rgba(138, 43, 226, 0.05);
-        border: 1px solid rgba(138, 43, 226, 0.15);
-        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.015) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 16px;
+        padding: 16px;
         text-align: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
     }
     
     .stats-badge:hover {
-        background: rgba(138, 43, 226, 0.12);
-        border-color: rgba(138, 43, 226, 0.4);
-        transform: translateY(-2px);
+        background: rgba(138, 43, 226, 0.08) !important;
+        border-color: rgba(168, 85, 247, 0.4) !important;
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 15px 30px rgba(138, 43, 226, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
     }
     
     .stats-label {
@@ -127,41 +171,43 @@ st.markdown("""
     .stats-value {
         font-size: 22px;
         font-weight: 700;
-        color: #f1f5f9;
+        background: linear-gradient(135deg, #f3e8ff, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-top: 4px;
         font-family: 'Outfit', sans-serif;
     }
     
-    /* Custom tabs styling */
+    /* Custom tabs pill styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 12px;
         background-color: transparent;
-        padding-bottom: 8px;
+        padding-bottom: 12px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
     
     .stTabs [data-baseweb="tab"] {
-        background-color: rgba(17, 20, 39, 0.3);
+        background-color: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        padding: 10px 20px;
+        border-radius: 12px;
+        padding: 12px 24px;
         color: #94a3b8;
         font-weight: 600;
         font-size: 15px;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
     .stTabs [data-baseweb="tab"]:hover {
         color: #c084fc;
-        background-color: rgba(138, 43, 226, 0.08);
-        border-color: rgba(138, 43, 226, 0.2);
+        border-color: rgba(168, 85, 247, 0.3);
+        background-color: rgba(138, 43, 226, 0.06);
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: rgba(138, 43, 226, 0.15) !important;
-        border-color: rgba(138, 43, 226, 0.4) !important;
+        background: linear-gradient(135deg, rgba(138, 43, 226, 0.22) 0%, rgba(79, 70, 229, 0.22) 100%) !important;
+        border-color: rgba(168, 85, 247, 0.5) !important;
         color: #ffffff !important;
-        box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+        box-shadow: 0 0 20px rgba(138, 43, 226, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.1) !important;
     }
 
     /* Custom suggestions button design */
@@ -189,8 +235,8 @@ st.markdown("""
         max-height: 500px;
         overflow-y: auto;
         padding: 20px;
-        background: rgba(7, 8, 14, 0.7);
-        border-radius: 14px;
+        background: rgba(5, 6, 11, 0.85);
+        border-radius: 16px;
         border: 1px solid rgba(255, 255, 255, 0.05);
         font-family: 'Courier New', Courier, monospace;
         font-size: 14px;
@@ -330,8 +376,14 @@ if api_key and api_key.strip() != "" and "YOUR_GEMINI_API_KEY" not in api_key:
 # 5. MAIN AREA PANEL (REDESIGNED)
 # ==========================================
 
+# Centered glow blobs for visual aesthetics
+st.markdown("""
+<div class="glow-blob blob-1"></div>
+<div class="glow-blob blob-2"></div>
+""", unsafe_allow_html=True)
+
 # Gradient header title (Centered)
-st.markdown('<h1 class="glow-header" style="text-align: center; margin-top: 20px; margin-bottom: 5px; font-size: 46px;">🌌 AuraDoc AI</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="glow-header" style="text-align: center; margin-top: 20px; margin-bottom: 5px; font-size: 46px;">🩺 Dr.Doc</h1>', unsafe_allow_html=True)
 st.markdown('<p style="text-align: center; color: #94a3b8; font-size: 16px; margin-bottom: 30px;">Direct, secure PDF & DOCX intelligence platform. Zero setup required.</p>', unsafe_allow_html=True)
 
 # 5a. API Key Error Block
@@ -341,7 +393,7 @@ if not is_key_valid:
         <div style="font-size: 60px; margin-bottom: 15px;">🔑</div>
         <h2 style="color: #ef4444; font-size: 24px; font-weight: 600; margin-bottom: 10px;">API Key Required</h2>
         <p style="color: #94a3b8; font-size: 14px; max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6;">
-            AuraDoc AI runs using automatic credentials. To use the application, please set your Gemini API key in the server configuration.
+            Dr.Doc runs using automatic credentials. To use the application, please set your Gemini API key in the server configuration.
         </p>
         <div style="text-align: left; max-width: 450px; margin: 0 auto; background: rgba(0, 0, 0, 0.3); padding: 18px 24px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.05); font-family: monospace; font-size: 13px; color: #cbd5e1; line-height: 1.5;">
             <strong>Local Setup:</strong><br>
@@ -377,7 +429,7 @@ if not uploaded_file:
         <div style="font-size: 50px; margin-bottom: 10px;">📥</div>
         <h3 style="color: #f1f5f9; font-size: 22px; font-weight: 600; margin-bottom: 20px;">Analyze Your Document</h3>
         <p style="color: #94a3b8; font-size: 14px; max-width: 500px; margin: 0 auto 30px auto; line-height: 1.6;">
-            AuraDoc AI parses your document locally in the browser/server and uses Gemini's next-gen 1-million token context window to perform comprehensive analysis and exact-context chat.
+            Dr.Doc parses your document locally in the browser/server and uses Gemini's next-gen 1-million token context window to perform comprehensive analysis and exact-context chat.
         </p>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: left; max-width: 700px; margin: 0 auto; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px;">
             <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
@@ -503,7 +555,7 @@ else:
                 model="gemini-3.5-flash",
                 config=types.GenerateContentConfig(
                     system_instruction=(
-                        "You are AuraDoc, a premium AI document assistant. "
+                        "You are Dr.Doc, a premium AI document assistant. "
                         "You answer user questions strictly and accurately based on the content of the uploaded document. "
                         "If the answer cannot be found in the document, reply: 'I cannot find that information in the uploaded document. "
                         "Please ask a question related to its content.' Use clear formatting and Markdown in your responses."
