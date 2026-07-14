@@ -17,10 +17,10 @@ st.set_page_config(
     page_title="AuraDoc AI - Document Analyzer & Chatbot",
     page_icon="🌌",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed" # Hide sidebar by default
 )
 
-# Premium Custom CSS Injection for Glassmorphism & Sleek Dark Mode
+# Premium Custom CSS Injection for Glassmorphism & Sleek Dark Mode (No Sidebar)
 st.markdown("""
 <style>
     /* Custom Google Fonts */
@@ -36,34 +36,41 @@ st.markdown("""
     
     /* Main Background & Accent glow */
     [data-testid="stAppViewContainer"] {
-        background-color: #0b0d19;
+        background-color: #080914;
         background-image: 
-            radial-gradient(at 10% 10%, rgba(138, 43, 226, 0.15) 0px, transparent 50%),
-            radial-gradient(at 90% 85%, rgba(0, 191, 255, 0.12) 0px, transparent 50%);
+            radial-gradient(at 0% 0%, rgba(138, 43, 226, 0.18) 0px, transparent 40%),
+            radial-gradient(at 100% 0%, rgba(0, 191, 255, 0.15) 0px, transparent 40%),
+            radial-gradient(at 50% 100%, rgba(138, 43, 226, 0.1) 0px, transparent 50%);
         background-attachment: fixed;
     }
     
-    /* Sidebar styling */
-    [data-testid="stSidebar"] {
-        background-color: #06070d !important;
-        border-right: 1px solid rgba(138, 43, 226, 0.2);
+    /* Hide sidebar button to completely ignore sidebar */
+    [data-testid="collapsedControl"] {
+        display: none !important;
     }
     
-    /* Glassmorphism elements */
+    /* Glassmorphism containers */
     .glass-card {
-        background: rgba(23, 26, 47, 0.55);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        background: rgba(17, 20, 39, 0.45);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    }
+    
+    .glass-card-subtle {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 16px;
-        border: 1px solid rgba(138, 43, 226, 0.2);
-        padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        padding: 20px;
     }
     
     /* Glowing headers */
     .glow-header {
-        background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #ec4899 100%);
+        background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #f43f5e 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800;
@@ -72,36 +79,40 @@ st.markdown("""
     
     /* Welcome landing page illustration card */
     .welcome-card {
-        border: 1px dashed rgba(138, 43, 226, 0.4);
-        background: rgba(23, 26, 47, 0.3);
-        border-radius: 20px;
-        padding: 40px;
+        background: rgba(17, 20, 39, 0.35);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        border: 1px solid rgba(138, 43, 226, 0.15);
+        padding: 50px 30px;
         text-align: center;
-        margin: 40px 0;
+        margin: 20px auto;
+        max-width: 800px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
     
     /* Document statistics badge container */
     .stats-container {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
-        margin-bottom: 25px;
+        height: 100%;
     }
     
     .stats-badge {
-        flex: 1;
-        min-width: 120px;
-        padding: 12px 16px;
-        background: rgba(138, 43, 226, 0.08);
-        border: 1px solid rgba(138, 43, 226, 0.25);
+        padding: 14px;
+        background: rgba(138, 43, 226, 0.05);
+        border: 1px solid rgba(138, 43, 226, 0.15);
         border-radius: 12px;
         text-align: center;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .stats-badge:hover {
-        background: rgba(138, 43, 226, 0.15);
-        border-color: rgba(138, 43, 226, 0.5);
+        background: rgba(138, 43, 226, 0.12);
+        border-color: rgba(138, 43, 226, 0.4);
         transform: translateY(-2px);
     }
     
@@ -114,7 +125,7 @@ st.markdown("""
     }
     
     .stats-value {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
         color: #f1f5f9;
         margin-top: 4px;
@@ -123,29 +134,34 @@ st.markdown("""
     
     /* Custom tabs styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 12px;
         background-color: transparent;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
     
     .stTabs [data-baseweb="tab"] {
-        background-color: rgba(23, 26, 47, 0.4);
-        border: 1px solid rgba(138, 43, 226, 0.1);
-        border-radius: 8px 8px 0 0;
-        padding: 8px 16px;
+        background-color: rgba(17, 20, 39, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 10px 20px;
         color: #94a3b8;
         font-weight: 600;
+        font-size: 15px;
         transition: all 0.3s ease;
     }
     
     .stTabs [data-baseweb="tab"]:hover {
         color: #c084fc;
-        background-color: rgba(138, 43, 226, 0.1);
+        background-color: rgba(138, 43, 226, 0.08);
+        border-color: rgba(138, 43, 226, 0.2);
     }
     
     .stTabs [aria-selected="true"] {
         background-color: rgba(138, 43, 226, 0.15) !important;
         border-color: rgba(138, 43, 226, 0.4) !important;
-        color: #f1f5f9 !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
     }
 
     /* Custom suggestions button design */
@@ -172,9 +188,9 @@ st.markdown("""
     .raw-text-container {
         max-height: 500px;
         overflow-y: auto;
-        padding: 16px;
-        background: #07080e;
-        border-radius: 12px;
+        padding: 20px;
+        background: rgba(7, 8, 14, 0.7);
+        border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.05);
         font-family: 'Courier New', Courier, monospace;
         font-size: 14px;
@@ -207,7 +223,7 @@ def extract_text_from_pdf(file):
     try:
         reader = PdfReader(file)
         text = ""
-        for i, page in enumerate(reader.pages):
+        for page in reader.pages:
             page_text = page.extract_text()
             if page_text:
                 text += page_text + "\n"
@@ -292,64 +308,118 @@ def generate_summary(text, client):
         return None
 
 # ==========================================
-# 4. SIDEBAR PANEL (CONFIG & UPLOAD)
+# 4. CREDENTIALS AUTHENTICATION (AUTOMATIC)
 # ==========================================
-with st.sidebar:
-    st.markdown('<h2 class="glow-header" style="font-size: 24px; margin-bottom: 5px;">🌌 AuraDoc AI</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">Document Intelligence Platform</p>', unsafe_allow_html=True)
-    
-    st.markdown('<h3 style="font-size: 16px; margin-bottom: 10px; color: #e2e8f0;">🔑 Authentication</h3>', unsafe_allow_html=True)
-    
-    # Check for pre-configured key
-    env_key = os.getenv("GEMINI_API_KEY")
-    
-    secrets_key = None
-    try:
-        if "GEMINI_API_KEY" in st.secrets:
-            secrets_key = st.secrets["GEMINI_API_KEY"]
-    except Exception:
-        pass
-        
-    default_key = env_key or secrets_key
-    
-    if default_key:
-        api_key_input = st.text_input(
-            "Gemini API Key",
-            value=default_key,
-            type="password",
-            help="Pre-loaded from environment / secrets. You can overwrite it here if needed."
-        )
-        st.success("API Key detected automatically.")
-    else:
-        api_key_input = st.text_input(
-            "Gemini API Key",
-            placeholder="AIzaSy...",
-            type="password",
-            help="Enter your Google Gemini API key. You can get one from Google AI Studio."
-        )
-        st.info("💡 You can get a free API key at [Google AI Studio](https://aistudio.google.com/)")
+env_key = os.getenv("GEMINI_API_KEY")
 
-    st.markdown("---")
+secrets_key = None
+try:
+    if "GEMINI_API_KEY" in st.secrets:
+        secrets_key = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    pass
+
+api_key = env_key or secrets_key
+
+# ==========================================
+# 5. MAIN AREA PANEL (REDESIGNED)
+# ==========================================
+
+# Gradient header title (Centered)
+st.markdown('<h1 class="glow-header" style="text-align: center; margin-top: 20px; margin-bottom: 5px; font-size: 46px;">🌌 AuraDoc AI</h1>', unsafe_allow_html=True)
+st.markdown('<p style="text-align: center; color: #94a3b8; font-size: 16px; margin-bottom: 30px;">Direct, secure PDF & DOCX intelligence platform. Zero setup required.</p>', unsafe_allow_html=True)
+
+# 5a. API Key Error Block
+if not api_key:
+    st.markdown("""
+    <div class="welcome-card" style="border-color: rgba(239, 68, 68, 0.4); max-width: 650px;">
+        <div style="font-size: 60px; margin-bottom: 15px;">🔑</div>
+        <h2 style="color: #ef4444; font-size: 24px; font-weight: 600; margin-bottom: 10px;">API Key Required</h2>
+        <p style="color: #94a3b8; font-size: 14px; max-width: 500px; margin: 0 auto 25px auto; line-height: 1.6;">
+            AuraDoc AI runs using automatic credentials. To use the application, please set your Gemini API key in the server configuration.
+        </p>
+        <div style="text-align: left; max-width: 450px; margin: 0 auto; background: rgba(0, 0, 0, 0.3); padding: 18px 24px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.05); font-family: monospace; font-size: 13px; color: #cbd5e1; line-height: 1.5;">
+            <strong>Local Setup:</strong><br>
+            Create a file named <code>.env</code> in the project directory with your key:<br>
+            <code style="color: #c084fc; font-weight: bold;">GEMINI_API_KEY=AIzaSy...</code><br><br>
+            <strong>Cloud Setup:</strong><br>
+            Add the <code>GEMINI_API_KEY</code> variable to your Streamlit Cloud Secrets.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.stop()
+
+# 5b. Document Uploader Layout (Centered if no file, side-by-side if uploaded)
+if not uploaded_file:
+    # Render welcome layout with centered dropzone
+    st.markdown('<div class="welcome-card">', unsafe_allow_html=True)
+    st.markdown('<div style="font-size: 50px; margin-bottom: 10px;">📥</div>', unsafe_allow_html=True)
+    st.markdown('<h3 style="color: #f1f5f9; font-size: 22px; font-weight: 600; margin-bottom: 20px;">Analyze Your Document</h3>', unsafe_allow_html=True)
     
-    st.markdown('<h3 style="font-size: 16px; margin-bottom: 10px; color: #e2e8f0;">📂 Document Upload</h3>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
-        "Upload PDF or DOCX",
+        "Upload PDF or DOCX file to get started",
         type=["pdf", "docx"],
-        help="Max file size ~50MB. Larger documents will fit easily into Gemini's 1-million token context window."
+        label_visibility="collapsed"
     )
     
-    # Process file change or clear button
-    if uploaded_file is not None:
-        if st.session_state.current_file_name != uploaded_file.name:
-            # File has changed, reset session variables
-            st.session_state.current_file_name = uploaded_file.name
-            st.session_state.document_text = ""
-            st.session_state.document_summary = ""
-            st.session_state.messages = []
-            st.session_state.chat_session = None
-            
-        st.markdown("---")
-        st.markdown('<h3 style="font-size: 16px; margin-bottom: 10px; color: #e2e8f0;">📊 Document Statistics</h3>', unsafe_allow_html=True)
+    st.markdown("""
+    <p style="color: #64748b; font-size: 13px; margin-top: 15px;">Supported formats: PDF, DOCX • File size up to 50MB</p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: left; max-width: 700px; margin: 40px auto 0 auto; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 25px;">
+        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+            <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">⚡ Direct Summary</h5>
+            <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">Extract themes, highlights, and action lists automatically within seconds.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+            <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">💬 Natural Chat</h5>
+            <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">Stateful chatbot understands the entire document context accurately.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+            <h5 style="color: #c084fc; margin-top:0; margin-bottom: 6px;">🔒 Pure Privacy</h5>
+            <p style="color: #64748b; font-size: 12px; margin: 0; line-height: 1.4;">No third-party middleware. All file processing runs directly on your instance.</p>
+        </div>
+    </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+else:
+    # File is uploaded. Reset state if it has changed.
+    if st.session_state.current_file_name != uploaded_file.name:
+        st.session_state.current_file_name = uploaded_file.name
+        st.session_state.document_text = ""
+        st.session_state.document_summary = ""
+        st.session_state.messages = []
+        st.session_state.chat_session = None
+
+    # Render top-bar side-by-side uploader + stats cards
+    st.markdown('<div class="glass-card" style="padding: 20px;">', unsafe_allow_html=True)
+    col_uploader, col_stats = st.columns([7, 5])
+    
+    with col_uploader:
+        st.markdown('<h4 style="font-size: 14px; margin-top: 0; color: #94a3b8; margin-bottom: 8px;">📂 Active File</h4>', unsafe_allow_html=True)
+        # Render a horizontal layout for file info and uploader
+        st.markdown(f"""
+        <div style="background: rgba(138, 43, 226, 0.08); border: 1px solid rgba(138, 43, 226, 0.2); padding: 10px 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-size: 15px; font-weight: 600; color: #ffffff;">📄 {uploaded_file.name}</div>
+            <div style="color: #a78bfa; font-size: 13px;">Ready for analysis</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Row layout for small replace file and reset buttons
+        col_btn1, col_btn2 = st.columns([1, 1])
+        with col_btn1:
+            # We place file_uploader inside a popover or just let them drag to replace
+            st.file_uploader("Replace document", type=["pdf", "docx"], label_visibility="collapsed", key="replace_file")
+        with col_btn2:
+            if st.button("🗑️ Reset Application", use_container_width=True):
+                st.session_state.current_file_name = None
+                st.session_state.document_text = ""
+                st.session_state.document_summary = ""
+                st.session_state.messages = []
+                st.session_state.chat_session = None
+                st.rerun()
+                
+    with col_stats:
+        st.markdown('<h4 style="font-size: 14px; margin-top: 0; color: #94a3b8; margin-bottom: 8px;">📊 Document Stats</h4>', unsafe_allow_html=True)
         
         # Calculate stats dynamically if text is extracted
         if st.session_state.document_text:
@@ -366,73 +436,40 @@ with st.sidebar:
                     <div class="stats-value">{words:,}</div>
                 </div>
                 <div class="stats-badge">
-                    <div class="stats-label">Characters</div>
-                    <div class="stats-value">{chars:,}</div>
-                </div>
-                <div class="stats-badge">
-                    <div class="stats-label">Est. Read Time</div>
-                    <div class="stats-value">{read_time}m</div>
-                </div>
-                <div class="stats-badge">
-                    <div class="stats-label">File Size</div>
-                    <div class="stats-value">{file_size_kb:.1f} KB</div>
+                    <div class="stats-label">Read Time</div>
+                    <div class="stats-value">{read_time} min</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="stats-container">
+                <div class="stats-badge"><div style="color: #64748b; font-size: 13px;">Extracting stats...</div></div>
+                <div class="stats-badge"><div style="color: #64748b; font-size: 13px;">Extracting stats...</div></div>
+            </div>
+            """, unsafe_allow_html=True)
             
-        if st.button("🗑️ Clear Document & Reset", use_container_width=True):
-            st.session_state.current_file_name = None
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Handle replacement file changes
+    if st.session_state.get("replace_file") is not None:
+        new_file = st.session_state.replace_file
+        if new_file.name != st.session_state.current_file_name:
+            st.session_state.current_file_name = new_file.name
             st.session_state.document_text = ""
             st.session_state.document_summary = ""
             st.session_state.messages = []
             st.session_state.chat_session = None
+            # Copy replacement file upload object
+            uploaded_file = new_file
             st.rerun()
 
-# ==========================================
-# 5. MAIN AREA PANEL (RESULTS & VISUALS)
-# ==========================================
-
-# Gradient header title
-st.markdown('<h1 class="glow-header" style="text-align: center; margin-top: 10px; margin-bottom: 5px; font-size: 42px;">🌌 AuraDoc AI</h1>', unsafe_allow_html=True)
-st.markdown('<p style="text-align: center; color: #94a3b8; font-size: 16px; margin-bottom: 40px;">Upload a PDF or DOCX file to extract deep summaries and engage in intelligent, contextual chat.</p>', unsafe_allow_html=True)
-
-if not uploaded_file:
-    # Landing / Welcome Page when no document is uploaded
-    st.markdown("""
-    <div class="welcome-card">
-        <div style="font-size: 60px; margin-bottom: 15px;">📥</div>
-        <h2 style="color: #f1f5f9; font-size: 24px; font-weight: 600; margin-bottom: 10px;">Awaiting Document Upload</h2>
-        <p style="color: #94a3b8; font-size: 15px; max-width: 550px; margin: 0 auto 30px auto; line-height: 1.6;">
-            AuraDoc AI parses your document locally in the browser/server and uses Gemini's next-gen 1-million token context window to perform comprehensive analysis and exact-context chat.
-        </p>
-        <div style="display: flex; justify-content: center; gap: 40px; text-align: left; max-width: 600px; margin: 0 auto;">
-            <div>
-                <h4 style="color: #c084fc; margin-bottom: 5px;">1. Set your Key</h4>
-                <p style="color: #64748b; font-size: 13px;">Provide your Gemini API key in the sidebar for secure processing.</p>
-            </div>
-            <div>
-                <h4 style="color: #c084fc; margin-bottom: 5px;">2. Upload File</h4>
-                <p style="color: #64748b; font-size: 13px;">Drop any PDF or DOCX document up to 50MB in size.</p>
-            </div>
-            <div>
-                <h4 style="color: #c084fc; margin-bottom: 5px;">3. Chat & Analyze</h4>
-                <p style="color: #64748b; font-size: 13px;">Read the structured executive summary and start asking questions.</p>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-elif not api_key_input:
-    # File uploaded but API key missing
-    st.warning("⚠️ Please provide a valid Gemini API Key in the sidebar to begin analyzing the document.")
-
-else:
-    # Initialize client and run analysis
-    client = get_gemini_client(api_key_input)
+    # Initialize client
+    client = get_gemini_client(api_key)
     
-    # 5a. Text Extraction Phase
+    # 5c. Text Extraction Phase
     if not st.session_state.document_text:
-        with st.status("🔮 Processing file & extracting text...", expanded=True) as status:
+        with st.status("🔮 Analyzing layout and extracting contents...", expanded=True) as status:
             if uploaded_file.name.lower().endswith(".pdf"):
                 text = extract_text_from_pdf(uploaded_file)
             else:
@@ -440,15 +477,15 @@ else:
             
             if text:
                 st.session_state.document_text = text
-                status.update(label="✅ Document parsed successfully!", state="complete", expanded=False)
+                status.update(label="✅ Document layout extracted successfully!", state="complete", expanded=False)
                 st.rerun()
             else:
                 status.update(label="❌ Failed to parse document content.", state="error")
                 st.stop()
                 
-    # 5b. Summary Generation Phase
+    # 5d. Summary Generation Phase
     if not st.session_state.document_summary:
-        with st.spinner("🧠 Generating Executive Summary with Gemini AI..."):
+        with st.spinner("🧠 Synthesizing executive summary & mapping concepts..."):
             summary = generate_summary(st.session_state.document_text, client)
             if summary:
                 st.session_state.document_summary = summary
@@ -457,7 +494,7 @@ else:
                 st.error("Could not generate summary. Check your API key or network connection.")
                 st.stop()
 
-    # 5c. Chat Initialization Phase
+    # 5e. Chat Initialization Phase
     if not st.session_state.chat_session:
         try:
             # Start a chat session with the document pre-loaded
@@ -490,7 +527,7 @@ else:
             st.stop()
 
     # ==========================================
-    # 6. MAIN WORKSPACE TABS
+    # 6. MAIN WORKSPACE TABS (GLASS TAB PANELS)
     # ==========================================
     tab_summary, tab_chat, tab_raw = st.tabs([
         "📊 Executive Summary", 
@@ -505,7 +542,7 @@ else:
         
         # Download summary button
         st.download_button(
-            label="📥 Download Summary (Markdown)",
+            label="📥 Download Executive Summary (Markdown)",
             data=st.session_state.document_summary,
             file_name=f"summary_{os.path.splitext(uploaded_file.name)[0]}.md",
             mime="text/markdown",
@@ -515,22 +552,19 @@ else:
         
     # --- TAB 2: INTERACTIVE CHATBOT ---
     with tab_chat:
-        st.markdown('<div class="glass-card" style="padding-bottom: 10px;">', unsafe_allow_html=True)
-        st.markdown('<h3 style="font-size: 18px; margin-top: 0; color: #e2e8f0; margin-bottom: 5px;">💬 Conversational Document Assistant</h3>', unsafe_allow_html=True)
-        st.markdown('<p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Ask specific questions, locate clauses, or search for data in the document.</p>', unsafe_allow_html=True)
+        st.markdown('<div class="glass-card" style="padding-bottom: 20px;">', unsafe_allow_html=True)
         
-        # Render Suggestion Buttons
-        st.markdown('<p style="color: #cbd5e1; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Quick Queries:</p>', unsafe_allow_html=True)
+        # Preset Quick Queries
+        st.markdown('<p style="color: #94a3b8; font-size: 13px; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">💡 Suggested Queries</p>', unsafe_allow_html=True)
         
-        # Create standard queries that set session state query value
         quick_prompts = [
             "Summarize the document in 3 sentences.",
             "What are the major risks or issues mentioned?",
             "Identify the key action items and deadlines.",
-            "Who are the key people, organizations or stakeholders?"
+            "Who are the key stakeholders involved?"
         ]
         
-        # We can use columns to lay out buttons
+        # Layout buttons horizontally
         cols = st.columns(len(quick_prompts))
         selected_quick_prompt = None
         for i, prompt_text in enumerate(quick_prompts):
@@ -539,7 +573,7 @@ else:
                 
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Render chat messages
+        # Render chat messages inside a glass layout
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
